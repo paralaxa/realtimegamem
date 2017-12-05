@@ -16,7 +16,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-
+//todo movement left right upper left, lower right...
+//todo questions repository
+//todo swords generator (2 in advance)
 @RestController
 @RequestMapping("game")
 @Api(value = "game", description = "Operations for controlling the game flow.")
@@ -25,7 +27,7 @@ public class GameService {
     private static final FieldsComparator fc = new FieldsComparator();
 
     @PostMapping("create")
-    public  List<Field<TwoDimensionalCoordinatesData>> createGame(@RequestBody Set<Player> players) {
+    public List<Field<TwoDimensionalCoordinatesData>> createGame(@RequestBody Set<Player> players) {
         game = new Game();
         SimpleGameFieldsGenerator sgf = new SimpleGameFieldsGenerator(20, null);
         Set<Field<TwoDimensionalCoordinatesData>> fields = sgf.generateFields();
@@ -33,6 +35,8 @@ public class GameService {
         game.startGame(board, players);
         return getBoardFields();
     }
+
+
 
     @PostMapping("move")
     public void move(@RequestBody Long playerId, @RequestBody TwoDimensionalCoordinatesData newPosition) {
