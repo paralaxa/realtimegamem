@@ -12,6 +12,7 @@ import sk.stopangin.realtimegamem.field.Field;
 import sk.stopangin.realtimegamem.field.FieldsComparator;
 import sk.stopangin.realtimegamem.game.Game;
 import sk.stopangin.realtimegamem.game.GameException;
+import sk.stopangin.realtimegamem.movement.MovementStatus;
 import sk.stopangin.realtimegamem.movement.TwoDimensionalCoordinatesData;
 import sk.stopangin.realtimegamem.player.Player;
 import sk.stopangin.realtimegamem.repository.InMemoryQuestionsRepositoryImpl;
@@ -24,12 +25,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-//todo movement left right upper left, lower right...
-//todo join player
-//todo return movement for move method
-//todo webscoket
-//todo questions repository
-//todo swords generator (2 in advance)
 //STOPSHIP - how will be player notified, that he was kicked out of the field?
 @RestController
 @RequestMapping("game")
@@ -55,13 +50,21 @@ public class GameService {
         return getBoardFields();
     }
 
-
-    @PostMapping("move/{playerId}")
-    public void move(@PathVariable("playerId") Long playerId, @RequestBody TwoDimensionalCoordinatesData newPosition) {
+    @PostMapping("/player/join")
+    public void joinPlayer(@RequestBody Player player) {
         validateGameStat();
         writeLock.lock();
-        game.move(playerId, newPosition);
+        game.joinPlayer(player);
         writeLock.unlock();
+    }
+
+    @PostMapping("move/{playerId}")
+    public MovementStatus move(@PathVariable("playerId") Long playerId, @RequestBody TwoDimensionalCoordinatesData newPosition) {
+        validateGameStat();
+        writeLock.lock();
+        MovementStatus movementStatus = game.move(playerId, newPosition);
+        writeLock.unlock();
+        return movementStatus;
     }
 
     @GetMapping("board")
@@ -77,12 +80,20 @@ public class GameService {
 
     @GetMapping("action/{playerId}")
     public ActionData getActionData(@PathVariable("playerId") Long playerId) {
-        return game.getActionData(playerId);
+        validateGameStat();
+        readLock.lock();
+        ActionData actionData = game.getActionData(playerId);
+        readLock.unlock();
+        return actionData;
     }
 
     @PostMapping("action/{playerId}")
     public Integer commitAction(@PathVariable("playerId") Long playerId, @RequestBody String actionData) {
-        return game.commitAction(playerId, actionData);
+        validateGameStat();
+        writeLock.lock();
+        Integer actionScore = game.commitAction(playerId, actionData);
+        writeLock.unlock();
+        return actionScore;
     }
 
     private void validateGameStat() {

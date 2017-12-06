@@ -24,7 +24,7 @@ public class ActionFieldInserter {
     }
 
     public void init() {
-        sizeOfBoard =(int)Math.sqrt(board.getFields().size());
+        sizeOfBoard = (int) Math.sqrt(board.getFields().size());
         questions = questionsRepository.getAllQuestions();
     }
 
@@ -35,15 +35,17 @@ public class ActionFieldInserter {
     }
 
     private void insertActionField() {
-        TwoDimensionalCoordinates coordinates = generateRandomCoordinates();
-        Field<TwoDimensionalCoordinatesData> fieldForCoordinates = board.getFieldForCoordinates(coordinates);
-        if (fieldDoesNotHavePieceOnIt(fieldForCoordinates) && isNotActionField(fieldForCoordinates)) {
-            board.getFields().remove(fieldForCoordinates);
-            ActionField actionField = createNewActionField(coordinates);
-            board.getFields().add(actionField);
-            log.info("Inserting action field on coordinates : {}", coordinates);
-        } else {
-            insertActionField();
+        if (!questions.isEmpty()) {
+            TwoDimensionalCoordinates coordinates = generateRandomCoordinates();
+            Field<TwoDimensionalCoordinatesData> fieldForCoordinates = board.getFieldForCoordinates(coordinates);
+            if (fieldDoesNotHavePieceOnIt(fieldForCoordinates) && isNotActionField(fieldForCoordinates)) {
+                board.getFields().remove(fieldForCoordinates);
+                ActionField actionField = createNewActionField(coordinates);
+                board.getFields().add(actionField);
+                log.info("Inserting action field on coordinates : {}", coordinates);
+            } else {
+                insertActionField();
+            }
         }
     }
 

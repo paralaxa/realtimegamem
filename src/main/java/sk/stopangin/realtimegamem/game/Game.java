@@ -36,24 +36,28 @@ public class Game extends BaseIdentifiableEntity {
     }
 
     public void joinPlayer(Player player) {
-        players.add(player);
-        enrichPlayerWithPiece(player);
+        if (getPlayerById(player.getId()) == null) {
+            players.add(player);
+            enrichPlayerWithPiece(player);
+        } else {
+            throw new GameException("Player with id:" + player.getId() + " already exist, choose another id.");
+        }
     }
 
     public Board getBoard() {
         return board;
     }
 
-    //todo co tu mam vraciat? MovementStatus, void?
-    public void move(Long playerId, TwoDimensionalCoordinatesData newPosition) {
+    public MovementStatus move(Long playerId, TwoDimensionalCoordinatesData newPosition) {
         Player player = getPlayerById(playerId);
         Movement<TwoDimensionalCoordinatesData> movement = new Movement<>();
         TwoDimensionalCoordinates newCoordinates = new TwoDimensionalCoordinates(newPosition);
         movement.setNewPosition(newCoordinates);
         MovementStatus movementStatus = player.doMove(board, movement);
         if (MovementStatus.COLLISION.equals(movementStatus)) {
-            handleCollision(movement, player);
+            return handleCollision(movement, player);
         }
+        return movementStatus;
     }
 
     public ActionData getActionData(Long playerId) {
@@ -92,7 +96,7 @@ public class Game extends BaseIdentifiableEntity {
         return board.getFieldForCoordinates(coordinatesForPieceId);
     }
 
-    private void handleCollision(Movement<TwoDimensionalCoordinatesData> movement, Player currentMovementPlayer) {
+    private MovementStatus handleCollision(Movement<TwoDimensionalCoordinatesData> movement, Player currentMovementPlayer) {
         Piece<TwoDimensionalCoordinatesData> pieceForCoordinates = board.getPieceForCoordinates(movement.getNewPosition()).iterator().next();
         Player playerOnNewCoordinates = getPlayerById(pieceForCoordinates.getPlayerId());
         CollisionStatus collisionStatus = identifyCollisionWinner(playerOnNewCoordinates, currentMovementPlayer);
@@ -105,6 +109,15 @@ public class Game extends BaseIdentifiableEntity {
         winner.incrementScore();
         log.info("Collision winner:{}", winner);
         log.info("Collision looser:{}", looser);
+        return getMovementStatus(currentMovementPlayer, winner);
+    }
+
+    private MovementStatus getMovementStatus(Player currentMovementPlayer, Player winner) {
+        if (winner.getId().equals(currentMovementPlayer.getId())) {
+            return MovementStatus.DONE;
+        } else {
+            return MovementStatus.RESET;
+        }
     }
 
 

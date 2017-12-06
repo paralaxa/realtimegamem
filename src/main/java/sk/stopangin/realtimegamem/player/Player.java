@@ -109,4 +109,5 @@ public class Player extends BaseIdentifiableEntity {
     public void incrementScore() {
         score++;
     }
+
 }
