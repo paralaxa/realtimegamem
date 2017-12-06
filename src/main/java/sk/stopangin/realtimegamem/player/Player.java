@@ -110,4 +110,13 @@ public class Player extends BaseIdentifiableEntity {
         score++;
     }
 
+    @Override
+    public String toString() {
+        return "Player{" +
+                "name='" + name + '\'' +
+                ", pieces=" + pieces +
+                ", score=" + score +
+                ", swordsCount=" + swordsCount +
+                '}';
+    }
 }
