@@ -1,14 +1,14 @@
 package sk.stopangin.realtimegamem.player;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import sk.stopangin.realtimegamem.board.Board;
-import sk.stopangin.realtimegamem.entity.BaseIdentifiableEntity;
-import sk.stopangin.realtimegamem.movement.Movement;
-import sk.stopangin.realtimegamem.movement.MovementStatus;
-import sk.stopangin.realtimegamem.movement.TwoDimensionalCoordinatesData;
-import sk.stopangin.realtimegamem.piece.Piece;
+        import com.fasterxml.jackson.annotation.JsonIgnore;
+        import sk.stopangin.realtimegamem.board.Board;
+        import sk.stopangin.realtimegamem.entity.BaseIdentifiableEntity;
+        import sk.stopangin.realtimegamem.movement.Movement;
+        import sk.stopangin.realtimegamem.movement.MovementStatus;
+        import sk.stopangin.realtimegamem.movement.TwoDimensionalCoordinatesData;
+        import sk.stopangin.realtimegamem.piece.Piece;
 
-import java.util.Set;
+        import java.util.Set;
 
 
 public class Player extends BaseIdentifiableEntity {

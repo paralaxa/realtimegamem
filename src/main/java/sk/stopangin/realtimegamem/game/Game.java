@@ -187,12 +187,10 @@ public class Game extends BaseIdentifiableEntity {
         }
         g.startGame(b, players, afi);
 
-        Player player1 = players.iterator().next();
-
-        g.move(player1.getId(), new TwoDimensionalCoordinatesData(1, 2));
-        g.move(player1.getId(), new TwoDimensionalCoordinatesData(1, 3));
-        g.move(player1.getId(), new TwoDimensionalCoordinatesData(1, 4));
-        g.move(player1.getId(), new TwoDimensionalCoordinatesData(1, 5));
+        g.move(1l, new TwoDimensionalCoordinatesData(1, 2));
+        g.move(1l, new TwoDimensionalCoordinatesData(1, 3));
+        g.move(1l, new TwoDimensionalCoordinatesData(1, 4));
+        g.move(1l, new TwoDimensionalCoordinatesData(1, 5));
 
         g.move(2l, new TwoDimensionalCoordinatesData(1, 2));
         g.move(2l, new TwoDimensionalCoordinatesData(1, 3));
