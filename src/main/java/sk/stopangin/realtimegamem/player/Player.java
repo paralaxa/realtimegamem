@@ -11,7 +11,7 @@ import sk.stopangin.realtimegamem.piece.Piece;
 import java.util.Set;
 
 
-public  class Player extends BaseIdentifiableEntity {
+public class Player extends BaseIdentifiableEntity {
     private String name;
     @JsonIgnore
     private Set<Piece<TwoDimensionalCoordinatesData>> pieces;
@@ -80,7 +80,7 @@ public  class Player extends BaseIdentifiableEntity {
         movement.setPieceId(findOrFillPieceIdIfNull(currentMovementPieceId));
     }
 
-    private Piece<TwoDimensionalCoordinatesData> getPlayersOnlyPiece() {
+    public Piece<TwoDimensionalCoordinatesData> getPlayersOnlyPiece() {
         return pieces.iterator().next();
     }
 

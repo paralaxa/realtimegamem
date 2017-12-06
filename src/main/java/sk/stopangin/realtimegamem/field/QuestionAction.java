@@ -7,6 +7,10 @@ import sk.stopangin.realtimegamem.player.Player;
 public class QuestionAction extends Action {
     private int score = 1;
 
+    public QuestionAction(ActionData actionData) {
+        super(actionData);
+    }
+
     @Override
     public Integer perform(Game game) {
         throw new UnsupportedOperationException("Use perform with game and data param.");
@@ -25,7 +29,9 @@ public class QuestionAction extends Action {
         }
 
         Player player = game.getPlayerById(playerId);
-        player.setScore(player.getSwordsCount() + roundScore);
+        int newScore = player.getSwordsCount() + roundScore;
+        newScore = newScore < 0 ? 0 : newScore;
+        player.setSwordsCount(newScore);
         return roundScore;
     }
 }

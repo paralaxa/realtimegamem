@@ -3,19 +3,17 @@ package sk.stopangin.realtimegamem.game;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sk.stopangin.realtimegamem.board.ActionFieldInserter;
 import sk.stopangin.realtimegamem.board.Board;
 import sk.stopangin.realtimegamem.board.RectangularBoard;
 import sk.stopangin.realtimegamem.board.SimpleGameFieldsGenerator;
 import sk.stopangin.realtimegamem.entity.BaseIdentifiableEntity;
-import sk.stopangin.realtimegamem.field.Field;
-import sk.stopangin.realtimegamem.field.FieldsComparator;
-import sk.stopangin.realtimegamem.movement.Movement;
-import sk.stopangin.realtimegamem.movement.MovementStatus;
-import sk.stopangin.realtimegamem.movement.TwoDimensionalCoordinates;
-import sk.stopangin.realtimegamem.movement.TwoDimensionalCoordinatesData;
+import sk.stopangin.realtimegamem.field.*;
+import sk.stopangin.realtimegamem.movement.*;
 import sk.stopangin.realtimegamem.piece.AnyDirectionTwoDimensionalMovingPiece;
 import sk.stopangin.realtimegamem.piece.Piece;
 import sk.stopangin.realtimegamem.player.Player;
+import sk.stopangin.realtimegamem.repository.InMemoryQuestionsRepositoryImpl;
 
 import java.util.*;
 
@@ -25,11 +23,15 @@ public class Game extends BaseIdentifiableEntity {
 
     private Board board;
     private Set<Player> players = new HashSet<>();
+    private ActionFieldInserter actionFieldInserter;
 
-    public Board startGame(Board board, Set<Player> players) {
+    public Board startGame(Board board, Set<Player> players, ActionFieldInserter actionFieldInserter) {
         this.board = board;
         this.players = players;
+        this.actionFieldInserter = actionFieldInserter;
         enrichPlayersWithPieces(players);
+        actionFieldInserter.init();
+        actionFieldInserter.insertActionFields(20);
         return board;
     }
 
@@ -54,6 +56,42 @@ public class Game extends BaseIdentifiableEntity {
         }
     }
 
+    public ActionData getActionData(Long playerId) {
+        Field<TwoDimensionalCoordinatesData> fieldForCoordinates = getFieldPlayerIsStayingOn(playerId);
+        if (fieldForCoordinates instanceof ActionField) {
+            return ((ActionField) fieldForCoordinates).getAction().getActionData();
+        }
+        return null;
+    }
+
+    public Integer commitAction(Long playerId, String actionData) {
+        Field<TwoDimensionalCoordinatesData> fieldForCoordinates = getFieldPlayerIsStayingOn(playerId);
+        if (fieldForCoordinates instanceof ActionField) {
+            log.info("Player with id:{} is performing action with data:{}", playerId, actionData);
+            Integer actionScore = ((ActionField) fieldForCoordinates).getAction().perform(this, playerId, actionData);
+            removeActionFieldAndCreateRegularFieldOnItsPosition(fieldForCoordinates);
+            actionFieldInserter.insertActionFields(1);
+            return actionScore;
+        }
+        return null;
+    }
+
+    private void removeActionFieldAndCreateRegularFieldOnItsPosition(Field<TwoDimensionalCoordinatesData> fieldForCoordinates) {
+        getBoard().getFields().remove(fieldForCoordinates);
+        Field<TwoDimensionalCoordinatesData> field = new RegularField();
+        field.setPosition(fieldForCoordinates.getPosition());
+        field.setPieces(fieldForCoordinates.getPieces());
+        getBoard().getFields().add(field);
+        log.info("Removing action field and creating regular field on position:{}", fieldForCoordinates.getPosition());
+    }
+
+    private Field<TwoDimensionalCoordinatesData> getFieldPlayerIsStayingOn(Long playerId) {
+        Player player = getPlayerById(playerId);
+        Piece<TwoDimensionalCoordinatesData> playersPiece = player.getPlayersOnlyPiece();
+        Coordinates<TwoDimensionalCoordinatesData> coordinatesForPieceId = board.getCoordinatesForPieceId(playersPiece.getId());
+        return board.getFieldForCoordinates(coordinatesForPieceId);
+    }
+
     private void handleCollision(Movement<TwoDimensionalCoordinatesData> movement, Player currentMovementPlayer) {
         Piece<TwoDimensionalCoordinatesData> pieceForCoordinates = board.getPieceForCoordinates(movement.getNewPosition()).iterator().next();
         Player playerOnNewCoordinates = getPlayerById(pieceForCoordinates.getPlayerId());
@@ -65,6 +103,8 @@ public class Game extends BaseIdentifiableEntity {
         movement.setPieceId(winner.getId());
         winner.doMove(board, movement);
         winner.incrementScore();
+        log.info("Collision winner:{}", winner);
+        log.info("Collision looser:{}", looser);
     }
 
 
@@ -123,15 +163,16 @@ public class Game extends BaseIdentifiableEntity {
 
     public static void main(String[] args) throws Exception {
         Game g = new Game();
-        SimpleGameFieldsGenerator sgf = new SimpleGameFieldsGenerator(20, null);
+
+        SimpleGameFieldsGenerator sgf = new SimpleGameFieldsGenerator(20);
         Set<Field<TwoDimensionalCoordinatesData>> fields = sgf.generateFields();
         Board b = new RectangularBoard(fields);
-
+        ActionFieldInserter afi = new ActionFieldInserter(b, new InMemoryQuestionsRepositoryImpl());
         Set<Player> players = new HashSet<>();
         for (int i = 0; i < 10; i++) {
             players.add(generatePlayer(i));
         }
-        g.startGame(b, players);
+        g.startGame(b, players, afi);
 
         Player player1 = players.iterator().next();
 
