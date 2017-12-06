@@ -2,6 +2,7 @@ package sk.stopangin.realtimegamem.service;
 
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.web.bind.annotation.*;
 import sk.stopangin.realtimegamem.board.ActionFieldInserter;
 import sk.stopangin.realtimegamem.board.Board;
@@ -32,7 +33,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class GameService {
     @Autowired
     private QuestionsRepository questionsRepository;
-
+    @Autowired
+    private SimpMessageSendingOperations messagingTemplate;
     private Game game;
     private static final FieldsComparator fc = new FieldsComparator();
     private ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock(true);
@@ -63,6 +65,7 @@ public class GameService {
         validateGameStat();
         writeLock.lock();
         MovementStatus movementStatus = game.move(playerId, newPosition);
+        messagingTemplate.convertAndSend("/topic/board", getBoardFields());
         writeLock.unlock();
         return movementStatus;
     }
