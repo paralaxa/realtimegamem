@@ -58,7 +58,7 @@ public class GameService {
         ActionFieldInserter afi = new ActionFieldInserter(board, questionsRepository);
         game.startGame(board, players, afi);
         game.setMessagingTemplate(messagingTemplate);
-        messagingTemplate.convertAndSend("/topic/board", getBoardFields());
+        messagingTemplate.convertAndSend(TOPIC_BOARD, getBoardFields());
         messagingTemplate.convertAndSend(TOPIC_STATUS, getPlayers());
         return getBoardFields();
     }
@@ -96,7 +96,7 @@ public class GameService {
         validateGameStat();
         writeLock.lock();
         MovementStatus movementStatus = game.move(playerId, newPosition);
-        messagingTemplate.convertAndSend("/topic/board", getBoardFields());
+        messagingTemplate.convertAndSend(TOPIC_BOARD, getBoardFields());
         writeLock.unlock();
         return movementStatus;
     }
@@ -126,7 +126,7 @@ public class GameService {
         validateGameStat();
         writeLock.lock();
         Integer actionScore = game.commitAction(playerId, actionData);
-        messagingTemplate.convertAndSend("/topic/board", getBoardFields());
+        messagingTemplate.convertAndSend(TOPIC_BOARD, getBoardFields());
         messagingTemplate.convertAndSend(TOPIC_STATUS, getPlayers());
         writeLock.unlock();
         return actionScore;
