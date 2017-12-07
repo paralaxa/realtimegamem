@@ -35,9 +35,13 @@ public class Game extends BaseIdentifiableEntity {
         return board;
     }
 
+    public Set<Player> getPlayers() {
+        return players;
+    }
+
     public void joinPlayer(Player player) {
-            players.add(player);
-            enrichPlayerWithPiece(player);
+        players.add(player);
+        enrichPlayerWithPiece(player);
     }
 
     public Board getBoard() {

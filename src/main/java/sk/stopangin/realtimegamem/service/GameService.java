@@ -57,13 +57,31 @@ public class GameService {
         return getBoardFields();
     }
 
-    @PostMapping("/player/join")
+    @PostMapping("/players/join")
     public void joinPlayer(@RequestBody Player player) {
         validateGameStat();
         writeLock.lock();
         game.joinPlayer(player);
         messagingTemplate.convertAndSend("/topic/board", getBoardFields());
         writeLock.unlock();
+    }
+
+    @GetMapping("/players")
+    public Set<Player> getPlayers() {
+        validateGameStat();
+        readLock.lock();
+        Set<Player> players = game.getPlayers();
+        readLock.unlock();
+        return players;
+    }
+
+    @GetMapping("/players/{playerId}")
+    public Player getPlayerById(@PathVariable("playerId") Long playerId) {
+        validateGameStat();
+        readLock.lock();
+        Player player = game.getPlayerById(playerId);
+        readLock.unlock();
+        return player;
     }
 
     @PostMapping("move/{playerId}")
@@ -84,7 +102,7 @@ public class GameService {
         List<Field<TwoDimensionalCoordinatesData>> fieldArrayList = new ArrayList<>(fields);
         Collections.sort(fieldArrayList, fc);
         readLock.unlock();
-        return  mapperFacade.mapAsList(fieldArrayList, ActionFieldDto.class);
+        return mapperFacade.mapAsList(fieldArrayList, ActionFieldDto.class);
     }
 
     @GetMapping("action/{playerId}")

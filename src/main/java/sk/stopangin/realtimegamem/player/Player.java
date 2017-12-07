@@ -1,6 +1,8 @@
 package sk.stopangin.realtimegamem.player;
 
+        import com.fasterxml.jackson.annotation.JsonGetter;
         import com.fasterxml.jackson.annotation.JsonIgnore;
+        import com.fasterxml.jackson.annotation.JsonProperty;
         import sk.stopangin.realtimegamem.board.Board;
         import sk.stopangin.realtimegamem.entity.BaseIdentifiableEntity;
         import sk.stopangin.realtimegamem.movement.Movement;
@@ -15,7 +17,9 @@ public class Player extends BaseIdentifiableEntity {
     private String name;
     @JsonIgnore
     private Set<Piece<TwoDimensionalCoordinatesData>> pieces;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private int score;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private int swordsCount;
 
     public MovementStatus doMove(Board board, Movement<TwoDimensionalCoordinatesData> movement) {
@@ -43,16 +47,13 @@ public class Player extends BaseIdentifiableEntity {
         return score;
     }
 
-    @JsonIgnore
     public void setScore(int score) {
         this.score = score;
     }
-
     public int getSwordsCount() {
         return swordsCount;
     }
 
-    @JsonIgnore
     public void setSwordsCount(int swordsCount) {
         this.swordsCount = swordsCount;
     }
