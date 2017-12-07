@@ -20,8 +20,6 @@ import sk.stopangin.realtimegamem.movement.TwoDimensionalCoordinatesData;
 import sk.stopangin.realtimegamem.player.Player;
 import sk.stopangin.realtimegamem.repository.QuestionsRepository;
 import sk.stopangin.realtimegamem.to.ActionFieldDto;
-import sk.stopangin.realtimegamem.to.BoardDto;
-import sk.stopangin.realtimegamem.to.FieldDto;
 
 import java.util.ArrayList;
 import java.util.Collections;
