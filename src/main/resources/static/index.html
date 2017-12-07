@@ -82,6 +82,9 @@
             stompClient.subscribe('/topic/board', function (data) {
                 render(data.body);
             });
+            stompClient.subscribe('/topic/status', function (data) {
+                console.log(data.body);
+            });
         });
     }
 

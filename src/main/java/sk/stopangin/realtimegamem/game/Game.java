@@ -2,6 +2,7 @@ package sk.stopangin.realtimegamem.game;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import sk.stopangin.realtimegamem.board.ActionFieldInserter;
 import sk.stopangin.realtimegamem.board.Board;
 import sk.stopangin.realtimegamem.entity.BaseIdentifiableEntity;
@@ -24,7 +25,7 @@ public class Game extends BaseIdentifiableEntity {
     private Board board;
     private Set<Player> players = new HashSet<>();
     private ActionFieldInserter actionFieldInserter;
-
+    private SimpMessageSendingOperations messagingTemplate;
     public Board startGame(Board board, Set<Player> players, ActionFieldInserter actionFieldInserter) {
         this.board = board;
         this.players = players;
@@ -33,6 +34,10 @@ public class Game extends BaseIdentifiableEntity {
         actionFieldInserter.init();
         actionFieldInserter.insertActionFields(20);
         return board;
+    }
+
+    public void setMessagingTemplate(SimpMessageSendingOperations messagingTemplate) {
+        this.messagingTemplate = messagingTemplate;
     }
 
     public Set<Player> getPlayers() {
@@ -109,6 +114,7 @@ public class Game extends BaseIdentifiableEntity {
         winner.incrementScore();
         log.info("Collision winner:{}", winner);
         log.info("Collision looser:{}", looser);
+        messagingTemplate.convertAndSend("/topic/status", getPlayers());
         return getMovementStatus(currentMovementPlayer, winner);
     }
 
