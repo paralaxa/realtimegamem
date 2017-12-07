@@ -35,6 +35,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 @RequestMapping("game")
 @Api(value = "game", description = "Operations for controlling the game flow.")
 public class GameService {
+    public static final String TOPIC_BOARD = "/topic/board";
+    public static final String TOPIC_STATUS = "/topic/status";
     @Autowired
     private QuestionsRepository questionsRepository;
     @Autowired
@@ -57,8 +59,8 @@ public class GameService {
         ActionFieldInserter afi = new ActionFieldInserter(board, questionsRepository);
         game.startGame(board, players, afi);
         game.setMessagingTemplate(messagingTemplate);
-        messagingTemplate.convertAndSend("/topic/board", getBoardFields());
-        messagingTemplate.convertAndSend("/topic/status", getPlayers());
+        messagingTemplate.convertAndSend(TOPIC_BOARD, getBoardFields());
+        messagingTemplate.convertAndSend(TOPIC_STATUS, getPlayers());
         return getBoardFields();
     }
 
@@ -72,8 +74,8 @@ public class GameService {
         player.setName(username);
         writeLock.lock();
         game.joinPlayer(player);
-        messagingTemplate.convertAndSend("/topic/board", getBoardFields());
-        messagingTemplate.convertAndSend("/topic/status", getPlayers());
+        messagingTemplate.convertAndSend(TOPIC_BOARD, getBoardFields());
+        messagingTemplate.convertAndSend(TOPIC_STATUS, getPlayers());
         writeLock.unlock();
     }
 
@@ -100,7 +102,7 @@ public class GameService {
         validateGameStat();
         writeLock.lock();
         MovementStatus movementStatus = game.move(getUserId(), newPosition);
-        messagingTemplate.convertAndSend("/topic/board", getBoardFields());
+        messagingTemplate.convertAndSend(TOPIC_BOARD, getBoardFields());
         writeLock.unlock();
         return movementStatus;
     }
@@ -130,8 +132,8 @@ public class GameService {
         validateGameStat();
         writeLock.lock();
         Integer actionScore = game.commitAction(getUserId(), actionData);
-        messagingTemplate.convertAndSend("/topic/board", getBoardFields());
-        messagingTemplate.convertAndSend("/topic/status", getPlayers());
+        messagingTemplate.convertAndSend(TOPIC_BOARD, getBoardFields());
+        messagingTemplate.convertAndSend(TOPIC_STATUS, getPlayers());
         writeLock.unlock();
         return actionScore;
     }

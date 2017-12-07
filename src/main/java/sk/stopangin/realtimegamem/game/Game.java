@@ -14,6 +14,7 @@ import sk.stopangin.realtimegamem.movement.*;
 import sk.stopangin.realtimegamem.piece.AnyDirectionTwoDimensionalMovingPiece;
 import sk.stopangin.realtimegamem.piece.Piece;
 import sk.stopangin.realtimegamem.player.Player;
+import sk.stopangin.realtimegamem.service.GameService;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -114,7 +115,7 @@ public class Game extends BaseIdentifiableEntity {
         winner.incrementScore();
         log.info("Collision winner:{}", winner);
         log.info("Collision looser:{}", looser);
-        messagingTemplate.convertAndSend("/topic/status", getPlayers());
+        messagingTemplate.convertAndSend(GameService.TOPIC_STATUS, getPlayers());
         return getMovementStatus(currentMovementPlayer, winner);
     }
 
