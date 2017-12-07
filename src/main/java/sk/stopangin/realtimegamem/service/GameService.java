@@ -4,7 +4,10 @@ import io.swagger.annotations.Api;
 import ma.glasnost.orika.MapperFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import sk.stopangin.realtimegamem.board.ActionFieldInserter;
 import sk.stopangin.realtimegamem.board.Board;
@@ -20,8 +23,6 @@ import sk.stopangin.realtimegamem.movement.TwoDimensionalCoordinatesData;
 import sk.stopangin.realtimegamem.player.Player;
 import sk.stopangin.realtimegamem.repository.QuestionsRepository;
 import sk.stopangin.realtimegamem.to.ActionFieldDto;
-import sk.stopangin.realtimegamem.to.BoardDto;
-import sk.stopangin.realtimegamem.to.FieldDto;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,7 +48,7 @@ public class GameService {
     private ReentrantReadWriteLock.ReadLock readLock = readWriteLock.readLock();
 
     @PostMapping("create")
-    @PreAuthorize("hasRole('ADMIN')")
+    @Secured ({"ROLE_ADMIN"})
     public List<ActionFieldDto> createGame(@RequestBody Set<Player> players) {
         game = new Game();
         SimpleGameFieldsGenerator sgf = new SimpleGameFieldsGenerator(20);
@@ -62,8 +63,13 @@ public class GameService {
     }
 
     @PostMapping("/players/join")
-    public void joinPlayer(@RequestBody Player player) {
+    public void joinPlayer() {
         validateGameStat();
+        UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String username = principal.getUsername();
+        Player player = new Player();
+        player.setId(getUserIdFromUsername(username));
+        player.setName(username);
         writeLock.lock();
         game.joinPlayer(player);
         messagingTemplate.convertAndSend("/topic/board", getBoardFields());
@@ -89,11 +95,11 @@ public class GameService {
         return player;
     }
 
-    @PostMapping("move/{playerId}")
-    public MovementStatus move(@PathVariable("playerId") Long playerId, @RequestBody TwoDimensionalCoordinatesData newPosition) {
+    @PostMapping("move")
+    public MovementStatus move(@RequestBody TwoDimensionalCoordinatesData newPosition) {
         validateGameStat();
         writeLock.lock();
-        MovementStatus movementStatus = game.move(playerId, newPosition);
+        MovementStatus movementStatus = game.move(getUserId(), newPosition);
         messagingTemplate.convertAndSend("/topic/board", getBoardFields());
         writeLock.unlock();
         return movementStatus;
@@ -110,20 +116,20 @@ public class GameService {
         return mapperFacade.mapAsList(fieldArrayList, ActionFieldDto.class);
     }
 
-    @GetMapping("action/{playerId}")
-    public ActionData getActionData(@PathVariable("playerId") Long playerId) {
+    @GetMapping("action")
+    public ActionData getActionData() {
         validateGameStat();
         readLock.lock();
-        ActionData actionData = game.getActionData(playerId);
+        ActionData actionData = game.getActionData(getUserId());
         readLock.unlock();
         return actionData;
     }
 
-    @PostMapping("action/{playerId}")
-    public Integer commitAction(@PathVariable("playerId") Long playerId, @RequestBody String actionData) {
+    @PostMapping("action")
+    public Integer commitAction(@RequestBody String actionData) {
         validateGameStat();
         writeLock.lock();
-        Integer actionScore = game.commitAction(playerId, actionData);
+        Integer actionScore = game.commitAction(getUserId(), actionData);
         messagingTemplate.convertAndSend("/topic/board", getBoardFields());
         messagingTemplate.convertAndSend("/topic/status", getPlayers());
         writeLock.unlock();
@@ -134,5 +140,18 @@ public class GameService {
         if (game == null) {
             throw new GameException("Game not initialized, create game first.");
         }
+    }
+
+    private Long getUserId() {
+        UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String username = principal.getUsername();
+        return getUserIdFromUsername(username);
+    }
+
+    private Long getUserIdFromUsername(String username) {
+        if (StringUtils.isEmpty(username) || !username.contains("_")) {
+            throw new GameException("Access denied. Invalid user, please contact support.");
+        }
+        return Long.valueOf(username.split("_")[1]);
     }
 }

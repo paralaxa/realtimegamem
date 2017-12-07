@@ -9,25 +9,27 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled=true)
+@EnableGlobalMethodSecurity(securedEnabled=true)
 public class WebSecurityAdapterSetup extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.inMemoryAuthentication()
-                .withUser("user1").password("ADMIN123").roles("ADMIN")
+                .withUser("admin_1").password("ADMIN123").roles("ADMIN")
                 .and()
-                .withUser("user2").password("secret2").roles("USER")
+                .withUser("user_1").password("secret1").roles("USER")
                 .and()
-                .withUser("user3").password("secret3").roles("USER")
+                .withUser("user_2").password("secret2").roles("USER")
                 .and()
-                .withUser("user4").password("secret4").roles("USER")
+                .withUser("user_3").password("secret3").roles("USER")
                 .and()
-                .withUser("user5").password("secret5").roles("USER")
+                .withUser("user_4").password("secret4").roles("USER")
                 .and()
-                .withUser("user6").password("secret6").roles("USER")
+                .withUser("user_5").password("secret5").roles("USER")
                 .and()
-                .withUser("user7").password("secret7").roles("USER");
+                .withUser("user_6").password("secret6").roles("USER")
+                .and()
+                .withUser("user_7").password("secret7").roles("USER");
     }
     @Override
     protected void configure(HttpSecurity http) throws Exception {
