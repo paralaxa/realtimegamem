@@ -36,12 +36,8 @@ public class Game extends BaseIdentifiableEntity {
     }
 
     public void joinPlayer(Player player) {
-        if (getPlayerById(player.getId()) == null) {
             players.add(player);
             enrichPlayerWithPiece(player);
-        } else {
-            throw new GameException("Player with id:" + player.getId() + " already exist, choose another id.");
-        }
     }
 
     public Board getBoard() {
