@@ -25,7 +25,7 @@ public class ActionFieldInserter {
 
     public void init() {
         sizeOfBoard = (int) Math.sqrt(board.getFields().size());
-        questions = questionsRepository.getAllQuestions();
+        questions = questionsRepository.findAll();
     }
 
     public void insertActionFields(int number) {

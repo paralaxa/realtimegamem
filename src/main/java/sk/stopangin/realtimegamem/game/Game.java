@@ -1,21 +1,21 @@
 package sk.stopangin.realtimegamem.game;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sk.stopangin.realtimegamem.board.ActionFieldInserter;
 import sk.stopangin.realtimegamem.board.Board;
-import sk.stopangin.realtimegamem.board.RectangularBoard;
-import sk.stopangin.realtimegamem.board.SimpleGameFieldsGenerator;
 import sk.stopangin.realtimegamem.entity.BaseIdentifiableEntity;
-import sk.stopangin.realtimegamem.field.*;
+import sk.stopangin.realtimegamem.field.ActionData;
+import sk.stopangin.realtimegamem.field.ActionField;
+import sk.stopangin.realtimegamem.field.Field;
+import sk.stopangin.realtimegamem.field.RegularField;
 import sk.stopangin.realtimegamem.movement.*;
 import sk.stopangin.realtimegamem.piece.AnyDirectionTwoDimensionalMovingPiece;
 import sk.stopangin.realtimegamem.piece.Piece;
 import sk.stopangin.realtimegamem.player.Player;
-import sk.stopangin.realtimegamem.repository.InMemoryQuestionsRepositoryImpl;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 // TODO GENERIFY!
 public class Game extends BaseIdentifiableEntity {
@@ -172,47 +172,6 @@ public class Game extends BaseIdentifiableEntity {
             }
         }
         throw new GameException("Non existing player for id:" + playerId);
-    }
-
-    public static void main(String[] args) throws Exception {
-        Game g = new Game();
-
-        SimpleGameFieldsGenerator sgf = new SimpleGameFieldsGenerator(20);
-        Set<Field<TwoDimensionalCoordinatesData>> fields = sgf.generateFields();
-        Board b = new RectangularBoard(fields);
-        ActionFieldInserter afi = new ActionFieldInserter(b, new InMemoryQuestionsRepositoryImpl());
-        Set<Player> players = new HashSet<>();
-        for (int i = 0; i < 10; i++) {
-            players.add(generatePlayer(i));
-        }
-        g.startGame(b, players, afi);
-
-        g.move(1l, new TwoDimensionalCoordinatesData(1, 2));
-        g.move(1l, new TwoDimensionalCoordinatesData(1, 3));
-        g.move(1l, new TwoDimensionalCoordinatesData(1, 4));
-        g.move(1l, new TwoDimensionalCoordinatesData(1, 5));
-
-        g.move(2l, new TwoDimensionalCoordinatesData(1, 2));
-        g.move(2l, new TwoDimensionalCoordinatesData(1, 3));
-        g.move(2l, new TwoDimensionalCoordinatesData(1, 4));
-        g.move(2l, new TwoDimensionalCoordinatesData(1, 5));
-
-        g.move(3l, new TwoDimensionalCoordinatesData(1, 2));
-        g.move(3l, new TwoDimensionalCoordinatesData(1, 3));
-        g.move(3l, new TwoDimensionalCoordinatesData(1, 4));
-        g.move(3l, new TwoDimensionalCoordinatesData(1, 5));
-
-        ArrayList<Field<TwoDimensionalCoordinatesData>> list = new ArrayList<>(g.board.getFields());
-        Collections.sort(list, new FieldsComparator());
-        ObjectMapper om = new ObjectMapper();
-        om.writeValue(System.out, list);
-    }
-
-    private static Player generatePlayer(int index) {
-        Player p = new Player();
-        p.setId(Long.valueOf(index));
-        p.setName("player_" + index);
-        return p;
     }
 
 

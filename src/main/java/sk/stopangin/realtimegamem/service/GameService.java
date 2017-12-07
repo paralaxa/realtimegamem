@@ -16,10 +16,8 @@ import sk.stopangin.realtimegamem.game.GameException;
 import sk.stopangin.realtimegamem.movement.MovementStatus;
 import sk.stopangin.realtimegamem.movement.TwoDimensionalCoordinatesData;
 import sk.stopangin.realtimegamem.player.Player;
-import sk.stopangin.realtimegamem.repository.InMemoryQuestionsRepositoryImpl;
 import sk.stopangin.realtimegamem.repository.QuestionsRepository;
 
-import javax.ws.rs.QueryParam;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

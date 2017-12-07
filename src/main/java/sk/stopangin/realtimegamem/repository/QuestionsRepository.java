@@ -1,10 +1,10 @@
 package sk.stopangin.realtimegamem.repository;
 
 
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 import sk.stopangin.realtimegamem.field.Question;
 
-import java.util.List;
-
-public interface QuestionsRepository {
-    List<Question> getAllQuestions();
+@Repository
+public interface QuestionsRepository extends JpaRepository<Question, Long> {
 }
