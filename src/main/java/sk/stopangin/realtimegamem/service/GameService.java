@@ -1,6 +1,7 @@
 package sk.stopangin.realtimegamem.service;
 
 import io.swagger.annotations.Api;
+import ma.glasnost.orika.MapperFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,9 @@ import sk.stopangin.realtimegamem.movement.MovementStatus;
 import sk.stopangin.realtimegamem.movement.TwoDimensionalCoordinatesData;
 import sk.stopangin.realtimegamem.player.Player;
 import sk.stopangin.realtimegamem.repository.QuestionsRepository;
+import sk.stopangin.realtimegamem.to.ActionFieldDto;
+import sk.stopangin.realtimegamem.to.BoardDto;
+import sk.stopangin.realtimegamem.to.FieldDto;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,6 +37,8 @@ public class GameService {
     private QuestionsRepository questionsRepository;
     @Autowired
     private SimpMessageSendingOperations messagingTemplate;
+    @Autowired
+    private MapperFacade mapperFacade;
     private Game game;
     private static final FieldsComparator fc = new FieldsComparator();
     private ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock(true);
@@ -40,7 +46,7 @@ public class GameService {
     private ReentrantReadWriteLock.ReadLock readLock = readWriteLock.readLock();
 
     @PostMapping("create")
-    public List<Field<TwoDimensionalCoordinatesData>> createGame(@RequestBody Set<Player> players) {
+    public List<ActionFieldDto> createGame(@RequestBody Set<Player> players) {
         game = new Game();
         SimpleGameFieldsGenerator sgf = new SimpleGameFieldsGenerator(20);
         Set<Field<TwoDimensionalCoordinatesData>> fields = sgf.generateFields();
@@ -71,14 +77,14 @@ public class GameService {
     }
 
     @GetMapping("board")
-    public List<Field<TwoDimensionalCoordinatesData>> getBoardFields() {
+    public List<ActionFieldDto> getBoardFields() {
         validateGameStat();
         readLock.lock();
         Set<Field<TwoDimensionalCoordinatesData>> fields = game.getBoard().getFields();
         List<Field<TwoDimensionalCoordinatesData>> fieldArrayList = new ArrayList<>(fields);
         Collections.sort(fieldArrayList, fc);
         readLock.unlock();
-        return fieldArrayList;
+        return  mapperFacade.mapAsList(fieldArrayList, ActionFieldDto.class);
     }
 
     @GetMapping("action/{playerId}")

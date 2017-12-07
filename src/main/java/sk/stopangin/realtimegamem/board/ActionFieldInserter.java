@@ -58,6 +58,7 @@ public class ActionFieldInserter {
                 .data(question.getAnswer())
                 .blocking(true)
                 .build();
+        actionData.setId(question.getId());
         QuestionAction questionAction = new QuestionAction(actionData);
         actionField.setAction(questionAction);
         questions.remove(question);
