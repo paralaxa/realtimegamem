@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import ma.glasnost.orika.MapperFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import sk.stopangin.realtimegamem.board.ActionFieldInserter;
 import sk.stopangin.realtimegamem.board.Board;
@@ -46,6 +47,7 @@ public class GameService {
     private ReentrantReadWriteLock.ReadLock readLock = readWriteLock.readLock();
 
     @PostMapping("create")
+    @PreAuthorize("hasRole('ADMIN')")
     public List<ActionFieldDto> createGame(@RequestBody Set<Player> players) {
         game = new Game();
         SimpleGameFieldsGenerator sgf = new SimpleGameFieldsGenerator(20);
