@@ -1,16 +1,15 @@
 package sk.stopangin.realtimegamem.player;
 
-        import com.fasterxml.jackson.annotation.JsonGetter;
-        import com.fasterxml.jackson.annotation.JsonIgnore;
-        import com.fasterxml.jackson.annotation.JsonProperty;
-        import sk.stopangin.realtimegamem.board.Board;
-        import sk.stopangin.realtimegamem.entity.BaseIdentifiableEntity;
-        import sk.stopangin.realtimegamem.movement.Movement;
-        import sk.stopangin.realtimegamem.movement.MovementStatus;
-        import sk.stopangin.realtimegamem.movement.TwoDimensionalCoordinatesData;
-        import sk.stopangin.realtimegamem.piece.Piece;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import sk.stopangin.realtimegamem.board.Board;
+import sk.stopangin.realtimegamem.entity.BaseIdentifiableEntity;
+import sk.stopangin.realtimegamem.movement.Movement;
+import sk.stopangin.realtimegamem.movement.MovementStatus;
+import sk.stopangin.realtimegamem.movement.TwoDimensionalCoordinatesData;
+import sk.stopangin.realtimegamem.piece.Piece;
 
-        import java.util.Set;
+import java.util.Set;
 
 
 public class Player extends BaseIdentifiableEntity {
@@ -80,7 +79,7 @@ public class Player extends BaseIdentifiableEntity {
         Long currentMovementPieceId = movement.getPieceId();
         movement.setPieceId(findOrFillPieceIdIfNull(currentMovementPieceId));
     }
-
+    @JsonIgnore
     public Piece<TwoDimensionalCoordinatesData> getPlayersOnlyPiece() {
         return pieces.iterator().next();
     }
