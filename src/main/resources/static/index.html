@@ -132,9 +132,6 @@
 <body>
 <div id="hiscores">
     <ul>
-        <li>Player 1 - <strong>50</strong></li>
-        <li>Player 2 - <strong>50</strong></li>
-        <li>Player 3 - <strong>50</strong></li>
     </ul>
     http://IP:8080/game/board
 </div>
@@ -143,6 +140,19 @@
 <script src="stomp.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 <script>
+    const playerColorMapping = {
+        1: 'blue',
+        2: 'green',
+        3: 'red',
+        4: 'yellow',
+        5: 'cadetblue',
+        6: 'burlywood',
+        7: 'darkcyan',
+        8: 'white',
+        9: 'salmon',
+        10: 'peachpuff',
+    }
+
     function connect() {
         var socket = new SockJS('/gs-guide-websocket');
         stompClient = Stomp.over(socket);
@@ -177,7 +187,7 @@
 
     function refreshHiscores(data) {
         document.querySelector('#hiscores ul').innerHTML = data.map(player => {
-            return `<li>${player.name} ${player.score}V ${player.swordsCount}M</li>`;
+            return `<li style="padding-left: 10px; border-left: 28px solid ${playerColorMapping[player.id]};">${player.name} ${player.score}:${player.swordsCount}</li>`;
         });
     }
 
