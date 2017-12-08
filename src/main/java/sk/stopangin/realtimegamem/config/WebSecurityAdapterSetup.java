@@ -6,10 +6,11 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import sk.stopangin.realtimegamem.service.GameService;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(securedEnabled=true)
+@EnableGlobalMethodSecurity(securedEnabled = true)
 public class WebSecurityAdapterSetup extends WebSecurityConfigurerAdapter {
 
     @Override
@@ -17,7 +18,7 @@ public class WebSecurityAdapterSetup extends WebSecurityConfigurerAdapter {
         auth.inMemoryAuthentication()
                 .withUser("admin_1").password("ADMIN123").roles("ADMIN")
                 .and()
-                .withUser("user_1").password("secret1").roles("USER")
+                .withUser(GameService.USER_1).password("secret1").roles("USER")
                 .and()
                 .withUser("user_2").password("secret2").roles("USER")
                 .and()
@@ -31,6 +32,7 @@ public class WebSecurityAdapterSetup extends WebSecurityConfigurerAdapter {
                 .and()
                 .withUser("user_7").password("secret7").roles("USER");
     }
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests().anyRequest().authenticated()

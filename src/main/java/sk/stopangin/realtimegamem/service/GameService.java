@@ -24,10 +24,7 @@ import sk.stopangin.realtimegamem.player.Player;
 import sk.stopangin.realtimegamem.repository.QuestionsRepository;
 import sk.stopangin.realtimegamem.to.ActionFieldDto;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 //STOPSHIP - how will be player notified, that he was kicked out of the field?
@@ -38,6 +35,7 @@ public class GameService {
 
     public static final String TOPIC_BOARD = "/topic/board";
     public static final String TOPIC_STATUS = "/topic/status";
+    public static final String USER_1 = "user_1";
 
     @Autowired
     private QuestionsRepository questionsRepository;
@@ -53,8 +51,9 @@ public class GameService {
 
     @PostMapping("create")
     @Secured({"ROLE_ADMIN"})
-    public List<ActionFieldDto> createGame(@RequestBody Set<Player> players) {
+    public List<ActionFieldDto> createGame() {
         game = new Game();
+        Set<Player> players = createFirstPlayerForGame();
         SimpleGameFieldsGenerator sgf = new SimpleGameFieldsGenerator(20);
         Set<Field<TwoDimensionalCoordinatesData>> fields = sgf.generateFields();
         Board board = new RectangularBoard(fields);
@@ -64,6 +63,15 @@ public class GameService {
         messagingTemplate.convertAndSend(TOPIC_BOARD, getBoardFields());
         messagingTemplate.convertAndSend(TOPIC_STATUS, getPlayers());
         return getBoardFields();
+    }
+
+    private Set<Player> createFirstPlayerForGame() {
+        Set<Player> players = new HashSet<>();
+        Player p1 = new Player();
+        p1.setName(USER_1);
+        p1.setId(getUserIdFromUsername(USER_1));
+        players.add(p1);
+        return players;
     }
 
     @PostMapping("/players/join")
