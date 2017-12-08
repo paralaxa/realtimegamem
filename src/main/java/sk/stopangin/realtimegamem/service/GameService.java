@@ -35,8 +35,10 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 @RequestMapping("game")
 @Api(value = "game", description = "Operations for controlling the game flow.")
 public class GameService {
+
     public static final String TOPIC_BOARD = "/topic/board";
     public static final String TOPIC_STATUS = "/topic/status";
+
     @Autowired
     private QuestionsRepository questionsRepository;
     @Autowired
@@ -50,7 +52,7 @@ public class GameService {
     private ReentrantReadWriteLock.ReadLock readLock = readWriteLock.readLock();
 
     @PostMapping("create")
-    @Secured ({"ROLE_ADMIN"})
+    @Secured({"ROLE_ADMIN"})
     public List<ActionFieldDto> createGame(@RequestBody Set<Player> players) {
         game = new Game();
         SimpleGameFieldsGenerator sgf = new SimpleGameFieldsGenerator(20);

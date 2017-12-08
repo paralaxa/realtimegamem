@@ -53,14 +53,14 @@ VALUES
   (
     7, '
 Priezvisko moderátora známej oldschulovej relácie “Repete” ',
-    'Krajíček'
+    'Krajicek'
   );
 /* INSERT QUERY */
 INSERT INTO question(id, content, answer)
 VALUES
   (
-    8, 'Názov enzýmov, ktoré majú schopnosť regulovať priebeh chemickej reakcie?',
-    'alosterické'
+    8, 'V ktorom roku sa potopil Titanic?',
+    1912
   );
 /* INSERT QUERY */
 INSERT INTO question(id, content, answer)

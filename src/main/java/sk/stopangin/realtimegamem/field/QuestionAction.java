@@ -22,7 +22,7 @@ public class QuestionAction extends Action {
         if (getActionData().isUsed()) {
             return 0;
         }
-        if (getActionData().getData().equals(data)) {
+        if (getActionData().getData().equalsIgnoreCase(data)) {
             roundScore = score;
         } else {
             roundScore = -score;
