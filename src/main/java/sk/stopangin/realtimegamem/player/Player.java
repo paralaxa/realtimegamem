@@ -9,6 +9,7 @@ import sk.stopangin.realtimegamem.movement.MovementStatus;
 import sk.stopangin.realtimegamem.movement.TwoDimensionalCoordinatesData;
 import sk.stopangin.realtimegamem.piece.Piece;
 
+import java.util.Objects;
 import java.util.Set;
 
 
@@ -56,6 +57,26 @@ public class Player extends BaseIdentifiableEntity {
     public void setSwordsCount(int swordsCount) {
         this.swordsCount = swordsCount;
     }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) return true;
+        if (!(o instanceof Player)) {
+            return false;
+        }
+        Player user = (Player) o;
+        return  Objects.equals(name, user.getName()) &&
+                Objects.equals(getId(), user.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, getId());
+    }
+
+
+
 
     /**
      * If id is null and there is only one piece for player, this method return the only pieces id,

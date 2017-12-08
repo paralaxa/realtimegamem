@@ -22,6 +22,8 @@ import sk.stopangin.realtimegamem.movement.MovementStatus;
 import sk.stopangin.realtimegamem.movement.TwoDimensionalCoordinatesData;
 import sk.stopangin.realtimegamem.player.Player;
 import sk.stopangin.realtimegamem.repository.QuestionsRepository;
+import sk.stopangin.realtimegamem.response.Hint;
+import sk.stopangin.realtimegamem.response.ResponseWithGuidance;
 import sk.stopangin.realtimegamem.to.ActionFieldDto;
 
 import java.util.*;
@@ -75,7 +77,7 @@ public class GameService {
     }
 
     @PostMapping("/players/join")
-    public void joinPlayer() {
+    public ResponseWithGuidance joinPlayer() {
         validateGameStat();
         UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String username = principal.getUsername();
@@ -90,6 +92,7 @@ public class GameService {
         } finally {
             writeLock.unlock();
         }
+        return ResponseWithGuidance.builder().hint(Hint.USE_MOVE_ENDPOINT).build();
     }
 
     @GetMapping("/players")
@@ -115,13 +118,18 @@ public class GameService {
     }
 
     @PostMapping("move")
-    public MovementStatus move(@RequestBody TwoDimensionalCoordinatesData newPosition) {
+    public ResponseWithGuidance move(@RequestBody TwoDimensionalCoordinatesData newPosition) {
         validateGameStat();
         try {
             writeLock.lock();
             MovementStatus movementStatus = game.move(getUserId(), newPosition);
+            if (movementStatus == MovementStatus.ACTION_REQUIRED || movementStatus == MovementStatus.ACTION_POSSIBLE) {
+                return ResponseWithGuidance.builder().message(movementStatus).hint(Hint.USE_ACTION_ENDPOINTS)
+                        .build();
+            }
             messagingTemplate.convertAndSend(TOPIC_BOARD, getBoardFields());
-            return movementStatus;
+            return ResponseWithGuidance.builder().message(movementStatus)
+                    .build();
         } finally {
             writeLock.unlock();
         }

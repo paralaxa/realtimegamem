@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS question(
 INSERT INTO question(id, content, answer)
 VALUES
   (
-    1, 'Dopln porekadlo. Syty hladnemu…',
+    1, 'Dopln porekadlo. Syty hladnemu...',
     'neveri'
   );
 /* INSERT QUERY */
@@ -52,7 +52,7 @@ INSERT INTO question(id, content, answer)
 VALUES
   (
     7, '
-Priezvisko moderatora znamej oldschulovej relacie “Repete” ',
+Priezvisko moderatora znamej oldschulovej relacie Repete ',
     'Krajicek'
   );
 /* INSERT QUERY */

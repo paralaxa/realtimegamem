@@ -14,6 +14,7 @@ import sk.stopangin.realtimegamem.movement.*;
 import sk.stopangin.realtimegamem.piece.AnyDirectionTwoDimensionalMovingPiece;
 import sk.stopangin.realtimegamem.piece.Piece;
 import sk.stopangin.realtimegamem.player.Player;
+import sk.stopangin.realtimegamem.player.PlayerException;
 import sk.stopangin.realtimegamem.service.GameService;
 
 import java.util.HashSet;
@@ -27,6 +28,7 @@ public class Game extends BaseIdentifiableEntity {
     private Set<Player> players = new HashSet<>();
     private ActionFieldInserter actionFieldInserter;
     private SimpMessageSendingOperations messagingTemplate;
+
     public Board startGame(Board board, Set<Player> players, ActionFieldInserter actionFieldInserter) {
         this.board = board;
         this.players = players;
@@ -46,6 +48,9 @@ public class Game extends BaseIdentifiableEntity {
     }
 
     public void joinPlayer(Player player) {
+        if (players.contains(player)) {
+            throw new PlayerException("Operation forbidden. You already joined this game.");
+        }
         players.add(player);
         enrichPlayerWithPiece(player);
     }
@@ -86,7 +91,8 @@ public class Game extends BaseIdentifiableEntity {
         return null;
     }
 
-    private void removeActionFieldAndCreateRegularFieldOnItsPosition(Field<TwoDimensionalCoordinatesData> fieldForCoordinates) {
+    private void removeActionFieldAndCreateRegularFieldOnItsPosition(Field<TwoDimensionalCoordinatesData>
+                                                                             fieldForCoordinates) {
         getBoard().getFields().remove(fieldForCoordinates);
         Field<TwoDimensionalCoordinatesData> field = new RegularField();
         field.setPosition(fieldForCoordinates.getPosition());
@@ -98,12 +104,15 @@ public class Game extends BaseIdentifiableEntity {
     private Field<TwoDimensionalCoordinatesData> getFieldPlayerIsStayingOn(Long playerId) {
         Player player = getPlayerById(playerId);
         Piece<TwoDimensionalCoordinatesData> playersPiece = player.getPlayersOnlyPiece();
-        Coordinates<TwoDimensionalCoordinatesData> coordinatesForPieceId = board.getCoordinatesForPieceId(playersPiece.getId());
+        Coordinates<TwoDimensionalCoordinatesData> coordinatesForPieceId = board.getCoordinatesForPieceId
+                (playersPiece.getId());
         return board.getFieldForCoordinates(coordinatesForPieceId);
     }
 
-    private MovementStatus handleCollision(Movement<TwoDimensionalCoordinatesData> movement, Player currentMovementPlayer) {
-        Piece<TwoDimensionalCoordinatesData> pieceForCoordinates = board.getPieceForCoordinates(movement.getNewPosition()).iterator().next();
+    private MovementStatus handleCollision(Movement<TwoDimensionalCoordinatesData> movement, Player
+            currentMovementPlayer) {
+        Piece<TwoDimensionalCoordinatesData> pieceForCoordinates = board.getPieceForCoordinates(movement
+                .getNewPosition()).iterator().next();
         Player playerOnNewCoordinates = getPlayerById(pieceForCoordinates.getPlayerId());
         CollisionStatus collisionStatus = identifyCollisionWinner(playerOnNewCoordinates, currentMovementPlayer);
         Player winner = collisionStatus.getWinner();
@@ -129,7 +138,8 @@ public class Game extends BaseIdentifiableEntity {
 
 
     /**
-     * If player on new coordinates >= swords count than player making the move, he wins (= cause of strategic advantage)
+     * If player on new coordinates >= swords count than player making the move, he wins (= cause of strategic
+     * advantage)
      *
      * @param playerOnNewCoordinates
      * @param currentMovementPlayer
@@ -164,11 +174,13 @@ public class Game extends BaseIdentifiableEntity {
     }
 
     private void enrichPlayerWithPiece(Player player) {
-        Piece<TwoDimensionalCoordinatesData> piece = new AnyDirectionTwoDimensionalMovingPiece(player.getId(), player.getName() + "_piece", player.getId());
+        Piece<TwoDimensionalCoordinatesData> piece = new AnyDirectionTwoDimensionalMovingPiece(player.getId(), player
+                .getName() + "_piece", player.getId());
         Set<Piece<TwoDimensionalCoordinatesData>> pieces1 = new HashSet<>();
         pieces1.add(piece);
         player.setPieces(pieces1);
-        Field<TwoDimensionalCoordinatesData> beginningField = getBoard().getFieldForCoordinates(board.getCoordinatesForInitialPosition());
+        Field<TwoDimensionalCoordinatesData> beginningField = getBoard().getFieldForCoordinates(board
+                .getCoordinatesForInitialPosition());
         beginningField.getPieces().add(piece);
     }
 
