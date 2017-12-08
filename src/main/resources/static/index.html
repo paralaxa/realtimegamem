@@ -6,15 +6,37 @@
             flex-direction: column;
             display: flex;
             justify-content: flex-start;
+            background: #2b2b2b;
+        }
+
+        #hiscores {
+            color: #fff;
+            font-family: verdana;
+            font-size: 23px;
+            position: fixed;
+            top: 10px;
+            right: 15px;
+            z-index: 1;
+            background: rgba(0,0,0,0.5);
+            padding: 1em;
+        }
+
+        #hiscores ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
         }
 
         .col {
+            position: relative;
             display: flex;
             justify-content: center;
             align-items: center;
-            border: 1px solid;
+            border: 1px solid rgba(255,255,255,0.3);
             width: 50px;
             flex-direction: column;
+            background: url(/grass2.jpg);
+            background-size: 100%;
         }
 
         .coordinates {
@@ -25,51 +47,77 @@
         .row {
             display: flex;
             flex-direction: row;
-            height: 100px;
+            height: 50px;
+        }
+
+        .player {
+            background: url(/player.png) no-repeat;
+            background-size: 40px;
+            background-position: center center;
         }
 
         .user_1_piece {
-            background-color: blue;
+            border-bottom: 5px solid blue;
         }
 
         .user_2_piece {
-            background-color: green;
+            border-bottom: 5px solid green;
         }
 
         .user_3_piece {
-            background-color: red;
+            border-bottom: 5px solid red;
         }
 
         .user_4_piece {
-            background-color: yellow;
+            border-bottom: 5px solid yellow;
         }
 
         .user_5_piece {
-            background-color: cadetblue;
+            border-bottom: 5px solid cadetblue;
         }
 
         .user_6_piece {
-            background-color: burlywood;
+            border-bottom: 5px solid burlywood;
         }
 
         .user_7_piece {
-            background-color: darkcyan;
+            border-bottom: 5px solid darkcyan;
         }
 
         .piece {
-            float: left;
-            width: 10px;
+            width: 40px;
+            height: 40px;
         }
 
         .action {
             width: 100%;
             height: 100%;
-            background: url('http://icons.iconarchive.com/icons/icons8/windows-8/256/Military-Sword-icon.png') no-repeat center;
-            background-size: 10px;
+            background: url(/sword.png) no-repeat center;
+            background-size: 15px;
+            position: absolute;
+            animation-name: floating;
+            animation-duration: 1s;
+            animation-iteration-count: infinite;
+            animation-timing-function: ease-in-out;
+        }
+
+        @keyframes floating {
+            from { transform: translate(0, -3px); }
+            50%  { transform: translate(0, 3px); }
+            to   { transform: translate(0, -3px); }
         }
     </style>
 </head>
 <body>
+<div id="hiscores">
+    <ul>
+        <li>Player 1 - <strong>50</strong></li>
+        <li>Player 2 - <strong>50</strong></li>
+        <li>Player 3 - <strong>50</strong></li>
+    </ul>
+    http://IP:8080/game/board
+</div>
+<div id="game"></div>
 <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
 <script src="stomp.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
@@ -91,25 +139,19 @@
     function render(fields) {
         var allFields = JSON.parse(fields);
         var render = '';
-        var iter = 0;
-        var itemsPerRow = Math.sqrt(allFields.length);
-        for (var i = 0; i < allFields.length; i++) {
-            if (iter === 0) {
-                render += "<div class='row'>";
+        var rows = Math.sqrt(allFields.length);
+        var cols = rows;
+        for (var row = 0; row < rows; row++) {
+            render += "<div class='row'>";
+            for (var col = 0; col < cols; col++) {
+                render += `<div class='col'>
+                    <div class='pieces'>${extractPieces(allFields[cols * col + row].pieces)}</div>
+                    ${extractAction(allFields[cols * col + row].action)}
+                </div>`;
             }
-            render +=
-                "<div class='col'>" +
-                "<div class='coordinates'>" + extractMeta(allFields[i].position) + "</div>" +
-                "<div class='pieces'>" + extractPieces(allFields[i].pieces) + "</div>" +
-                extractAction(allFields[i].action) +
-                "</div>";
-            if (iter === itemsPerRow - 1) {
-                render += "</div>";
-                iter = -1;
-            }
-            iter++;
+            render += "</div>";
         }
-        document.getElementsByTagName('body')[0].innerHTML = render;
+        document.getElementById('game').innerHTML = render;
     }
 
     function extractMeta(position) {
@@ -120,7 +162,7 @@
         var result = '';
         if (pieces && pieces.length > 0) {
             for (var i = 0; i < pieces.length; i++) {
-                result += "<div class='piece " + pieces[i].name + "'>&nbsp;</div>";
+                result += "<div class='piece player " + pieces[i].name + "'>&nbsp;</div>";
             }
         }
         return result;
