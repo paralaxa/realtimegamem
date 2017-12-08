@@ -1,6 +1,7 @@
 package sk.stopangin.realtimegamem.service;
 
 import io.swagger.annotations.Api;
+import javafx.util.Pair;
 import ma.glasnost.orika.MapperFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
@@ -18,6 +19,7 @@ import sk.stopangin.realtimegamem.field.Field;
 import sk.stopangin.realtimegamem.field.FieldsComparator;
 import sk.stopangin.realtimegamem.game.Game;
 import sk.stopangin.realtimegamem.game.GameException;
+import sk.stopangin.realtimegamem.movement.Coordinates;
 import sk.stopangin.realtimegamem.movement.MovementStatus;
 import sk.stopangin.realtimegamem.movement.TwoDimensionalCoordinatesData;
 import sk.stopangin.realtimegamem.player.Player;
@@ -108,11 +110,14 @@ public class GameService {
     }
 
     @GetMapping("/players/{playerId}")
-    public Player getPlayerById(@PathVariable("playerId") Long playerId) {
+    public Object getPlayerById(@PathVariable("playerId") Long playerId) {
         validateGameStat();
         try {
             readLock.lock();
-            return game.getPlayerById(playerId);
+            Coordinates<TwoDimensionalCoordinatesData> playerCoordinates = game.getBoard()
+                    .getCoordinatesForPieceId(playerId);
+
+            return new Pair(game.getPlayerById(playerId), playerCoordinates);
         } finally {
             readLock.unlock();
         }
