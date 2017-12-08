@@ -22,17 +22,24 @@ public class WebSecurityAdapterSetup extends WebSecurityConfigurerAdapter {
                 .withUser(GameService.USER_1).password("ivanjesaman").roles("ADMIN")
                 .and()
                 //real users from here
-                .withUser("user_2").password("secret2").roles("USER")
+                .withUser("CuchyJeNajlepsi_2").password("MartinCuchtaJeNajlepsi").roles("USER")
                 .and()
-                .withUser("user_3").password("secret3").roles("USER")
+                .withUser("kikiriki_3").password("heslo").roles("USER")
                 .and()
-                .withUser("user_4").password("secret4").roles("USER")
+                .withUser("admin_4").password("admin").roles("USER")
                 .and()
-                .withUser("user_5").password("secret5").roles("USER")
+                .withUser("riso_5").password("ramones").roles("USER")
                 .and()
-                .withUser("user_6").password("secret6").roles("USER")
+                .withUser("C++_6").password("Lubos").roles("USER")
                 .and()
-                .withUser("user_7").password("secret7").roles("USER");
+                .withUser("riekt_7").password("riektriekt").roles("USER")
+                .and()
+                .withUser("Kotkodaky_8").password("kikirik").roles("USER")
+                .and()
+                .withUser("Zoligor_9").password("event123").roles("USER")
+                .and()
+                .withUser("Cplusplus_10").password("Lubos").roles("USER")
+        ;
     }
 
     @Override
