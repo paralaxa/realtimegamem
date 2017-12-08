@@ -19,6 +19,7 @@
             z-index: 1;
             background: rgba(0,0,0,0.5);
             padding: 1em;
+            max-width: 320px;
         }
 
         #hiscores ul {
@@ -84,9 +85,29 @@
             border-bottom: 5px solid darkcyan;
         }
 
+        .user_8_piece {
+            border-bottom: 5px solid white;
+        }
+
+        .user_9_piece {
+            border-bottom: 5px solid salmon;
+        }
+
+        .user_10_piece {
+            border-bottom: 5px solid peachpuff;
+        }
+
+        .pieces {
+            width: 100%;
+            height: 100%;
+        }
+
         .piece {
             width: 40px;
             height: 40px;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
         }
 
         .action {
@@ -131,7 +152,7 @@
                 render(data.body);
             });
             stompClient.subscribe('/topic/status', function (data) {
-                console.log(data.body);
+                refreshHiscores(JSON.parse(data.body));
             });
         });
     }
@@ -154,6 +175,12 @@
         document.getElementById('game').innerHTML = render;
     }
 
+    function refreshHiscores(data) {
+        document.querySelector('#hiscores ul').innerHTML = data.map(player => {
+            return `<li>${player.name} ${player.score}V ${player.swordsCount}M</li>`;
+        });
+    }
+
     function extractMeta(position) {
         return '[' + position.data.x + ':' + position.data.y + ']';
     }
@@ -162,7 +189,7 @@
         var result = '';
         if (pieces && pieces.length > 0) {
             for (var i = 0; i < pieces.length; i++) {
-                result += "<div class='piece player " + pieces[i].name + "'>&nbsp;</div>";
+                result += "<div class='piece player " + pieces[i].name + "' style='margin-left:" + (i*2) + "px'>&nbsp;</div>";
             }
         }
         return result;
