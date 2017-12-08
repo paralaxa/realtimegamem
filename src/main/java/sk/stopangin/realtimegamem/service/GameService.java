@@ -123,11 +123,11 @@ public class GameService {
         try {
             writeLock.lock();
             MovementStatus movementStatus = game.move(getUserId(), newPosition);
+            messagingTemplate.convertAndSend(TOPIC_BOARD, getBoardFields());
             if (movementStatus == MovementStatus.ACTION_REQUIRED || movementStatus == MovementStatus.ACTION_POSSIBLE) {
                 return ResponseWithGuidance.builder().message(movementStatus).hint(Hint.USE_ACTION_ENDPOINTS)
                         .build();
             }
-            messagingTemplate.convertAndSend(TOPIC_BOARD, getBoardFields());
             return ResponseWithGuidance.builder().message(movementStatus)
                     .build();
         } finally {
