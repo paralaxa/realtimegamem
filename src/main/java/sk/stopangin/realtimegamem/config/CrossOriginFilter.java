@@ -3,8 +3,10 @@ package sk.stopangin.realtimegamem.config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.*;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
@@ -14,20 +16,14 @@ import java.io.IOException;
  */
 
 @Component
-public class CrossOriginFilter implements Filter {
+public class CrossOriginFilter extends OncePerRequestFilter {
     private static final Logger log = LoggerFactory.getLogger(CrossOriginFilter.class);
 
-    @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
 
-        // Called by the web container to indicate to a filter that it is being
-        // placed into service.
-        // We do not want to do anything here.
-    }
 
     @Override
-    public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)
-            throws IOException, ServletException {
+    protected void doFilterInternal(HttpServletRequest req, HttpServletResponse resp,
+                                    FilterChain chain) throws ServletException, IOException {
 
         log.info("Applying CORS filter");
         HttpServletResponse response = (HttpServletResponse) resp;
