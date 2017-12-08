@@ -29,7 +29,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 //STOPSHIP - how will be player notified, that he was kicked out of the field?
 @RestController
-@RequestMapping(value = "game", produces = "application/json;charset=UTF-8")
+@RequestMapping("game")
 @Api(value = "game", description = "Operations for controlling the game flow.")
 public class GameService {
 
