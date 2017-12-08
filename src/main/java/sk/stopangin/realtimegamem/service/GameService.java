@@ -74,70 +74,88 @@ public class GameService {
         Player player = new Player();
         player.setId(getUserIdFromUsername(username));
         player.setName(username);
-        writeLock.lock();
-        game.joinPlayer(player);
-        messagingTemplate.convertAndSend(TOPIC_BOARD, getBoardFields());
-        messagingTemplate.convertAndSend(TOPIC_STATUS, getPlayers());
-        writeLock.unlock();
+        try {
+            writeLock.lock();
+            game.joinPlayer(player);
+            messagingTemplate.convertAndSend(TOPIC_BOARD, getBoardFields());
+            messagingTemplate.convertAndSend(TOPIC_STATUS, getPlayers());
+        } finally {
+            writeLock.unlock();
+        }
     }
 
     @GetMapping("/players")
     public Set<Player> getPlayers() {
         validateGameStat();
-        readLock.lock();
-        Set<Player> players = game.getPlayers();
-        readLock.unlock();
-        return players;
+        try {
+            readLock.lock();
+           return game.getPlayers();
+        } finally {
+            readLock.unlock();
+        }
     }
 
     @GetMapping("/players/{playerId}")
     public Player getPlayerById(@PathVariable("playerId") Long playerId) {
         validateGameStat();
-        readLock.lock();
-        Player player = game.getPlayerById(playerId);
-        readLock.unlock();
-        return player;
+        try {
+            readLock.lock();
+            return game.getPlayerById(playerId);
+        } finally {
+            readLock.unlock();
+        }
     }
 
     @PostMapping("move")
     public MovementStatus move(@RequestBody TwoDimensionalCoordinatesData newPosition) {
         validateGameStat();
-        writeLock.lock();
-        MovementStatus movementStatus = game.move(getUserId(), newPosition);
-        messagingTemplate.convertAndSend(TOPIC_BOARD, getBoardFields());
-        writeLock.unlock();
-        return movementStatus;
+        try {
+            writeLock.lock();
+            MovementStatus movementStatus = game.move(getUserId(), newPosition);
+            messagingTemplate.convertAndSend(TOPIC_BOARD, getBoardFields());
+            return movementStatus;
+        } finally {
+            writeLock.unlock();
+        }
     }
 
     @GetMapping("board")
     public List<ActionFieldDto> getBoardFields() {
         validateGameStat();
-        readLock.lock();
-        Set<Field<TwoDimensionalCoordinatesData>> fields = game.getBoard().getFields();
-        List<Field<TwoDimensionalCoordinatesData>> fieldArrayList = new ArrayList<>(fields);
-        Collections.sort(fieldArrayList, fc);
-        readLock.unlock();
-        return mapperFacade.mapAsList(fieldArrayList, ActionFieldDto.class);
+        try {
+            readLock.lock();
+            Set<Field<TwoDimensionalCoordinatesData>> fields = game.getBoard().getFields();
+            List<Field<TwoDimensionalCoordinatesData>> fieldArrayList = new ArrayList<>(fields);
+            Collections.sort(fieldArrayList, fc);
+            return mapperFacade.mapAsList(fieldArrayList, ActionFieldDto.class);
+        } finally {
+            readLock.unlock();
+        }
     }
 
     @GetMapping("action")
     public ActionData getActionData() {
         validateGameStat();
-        readLock.lock();
-        ActionData actionData = game.getActionData(getUserId());
-        readLock.unlock();
-        return actionData;
+        try {
+            readLock.lock();
+            return game.getActionData(getUserId());
+        } finally {
+            readLock.unlock();
+        }
     }
 
     @PostMapping("action")
     public Integer commitAction(@RequestBody String actionData) {
         validateGameStat();
-        writeLock.lock();
-        Integer actionScore = game.commitAction(getUserId(), actionData);
-        messagingTemplate.convertAndSend(TOPIC_BOARD, getBoardFields());
-        messagingTemplate.convertAndSend(TOPIC_STATUS, getPlayers());
-        writeLock.unlock();
-        return actionScore;
+        try {
+            writeLock.lock();
+            Integer actionScore = game.commitAction(getUserId(), actionData);
+            messagingTemplate.convertAndSend(TOPIC_BOARD, getBoardFields());
+            messagingTemplate.convertAndSend(TOPIC_STATUS, getPlayers());
+            return actionScore;
+        } finally {
+            writeLock.unlock();
+        }
     }
 
     private void validateGameStat() {
