@@ -15,6 +15,7 @@ import sk.stopangin.realtimegamem.piece.AnyDirectionTwoDimensionalMovingPiece;
 import sk.stopangin.realtimegamem.piece.Piece;
 import sk.stopangin.realtimegamem.player.Player;
 import sk.stopangin.realtimegamem.player.PlayerException;
+import sk.stopangin.realtimegamem.response.Hint;
 import sk.stopangin.realtimegamem.service.GameService;
 
 import java.util.HashSet;
@@ -49,7 +50,8 @@ public class Game extends BaseIdentifiableEntity {
 
     public void joinPlayer(Player player) {
         if (players.contains(player)) {
-            throw new PlayerException("Operation forbidden. You already joined this game.");
+            throw new PlayerException("Operation forbidden. You already joined this game.Hint." + Hint
+                    .USE_MOVE_ENDPOINT.getHint());
         }
         players.add(player);
         enrichPlayerWithPiece(player);
