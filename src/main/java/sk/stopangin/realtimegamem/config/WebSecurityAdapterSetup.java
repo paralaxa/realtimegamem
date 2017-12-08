@@ -18,8 +18,10 @@ public class WebSecurityAdapterSetup extends WebSecurityConfigurerAdapter {
         auth.inMemoryAuthentication()
                 .withUser("admin_1").password("ADMIN123").roles("ADMIN")
                 .and()
-                .withUser(GameService.USER_1).password("secret1").roles("USER")
+                //initial user - me - BIG BAD WOLF
+                .withUser(GameService.USER_1).password("ivanjesaman").roles("ADMIN")
                 .and()
+                //real users from here
                 .withUser("user_2").password("secret2").roles("USER")
                 .and()
                 .withUser("user_3").password("secret3").roles("USER")
@@ -35,7 +37,10 @@ public class WebSecurityAdapterSetup extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests().anyRequest().authenticated()
+        http.authorizeRequests()
+                .antMatchers("/v2/api-docs", "/configuration/ui", "/swagger-resources", "/configuration/security",
+                        "/swagger-ui.html", "/webjars/**").hasRole("ADMIN")
+                .anyRequest().authenticated()
                 .and()
                 .httpBasic()
                 .and().csrf().disable();

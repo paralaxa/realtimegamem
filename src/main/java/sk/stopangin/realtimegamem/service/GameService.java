@@ -37,7 +37,7 @@ public class GameService {
 
     public static final String TOPIC_BOARD = "/topic/board";
     public static final String TOPIC_STATUS = "/topic/status";
-    public static final String USER_1 = "user_1";
+    public static final String USER_1 = "IVAN.HROZNY_1";
 
     @Autowired
     private QuestionsRepository questionsRepository;
@@ -72,6 +72,7 @@ public class GameService {
         Player p1 = new Player();
         p1.setName(USER_1);
         p1.setId(getUserIdFromUsername(USER_1));
+        p1.setSwordsCount(100);
         players.add(p1);
         return players;
     }
@@ -117,7 +118,7 @@ public class GameService {
         }
     }
 
-    @PostMapping("move")
+    @PostMapping("bewegen")
     public ResponseWithGuidance move(@RequestBody TwoDimensionalCoordinatesData newPosition) {
         validateGameStat();
         try {
@@ -149,7 +150,7 @@ public class GameService {
         }
     }
 
-    @GetMapping("action")
+    @GetMapping("akcija")
     public ActionData getActionData() {
         validateGameStat();
         try {
@@ -160,7 +161,7 @@ public class GameService {
         }
     }
 
-    @PostMapping("action")
+    @PostMapping("akcija")
     public Integer commitAction(@RequestBody String actionData) {
         validateGameStat();
         try {
