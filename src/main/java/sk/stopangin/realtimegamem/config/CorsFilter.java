@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-@Component
+//@Component
 public class CorsFilter {
     /**
      * Allowing all origins, headers and methods here is only intended to keep this example simple.

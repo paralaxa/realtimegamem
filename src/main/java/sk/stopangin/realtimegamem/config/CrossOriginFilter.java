@@ -13,7 +13,7 @@ import java.io.IOException;
  * system
  */
 
-//@Component
+@Component
 public class CrossOriginFilter implements Filter {
     private static final Logger log = LoggerFactory.getLogger(CrossOriginFilter.class);
 
